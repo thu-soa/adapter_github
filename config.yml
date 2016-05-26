@@ -1,0 +1,5 @@
+urls:
+  auth_host:            http://localhost:8002
+  auth_login_path:      /api/v1/login
+  auth_user_info_path:  /api/v1/user_info
+  scheduler_host:       http://localhost:8001

@@ -4,12 +4,6 @@ require 'sidekiq'
 require 'json'
 require 'http'
 
-# SCHEDULER_PUSH_URL = 'http://scheduler.soa.a1ex.wang/api/v1/unread_messages'
-SCHEDULER_PUSH_URL = 'http://localhost:8001/api/v1/unread_messages'
-AUTH_URL_PART_1 = 'http://localhost:8002'
-AUTH_URL = AUTH_URL_PART_1 + '/api/v1/login'
-USER_INFO_URL = AUTH_URL_PART_1 + '/api/v1/user_info'
-
 Sidekiq.configure_client do |config|
   config.redis = { namespace: 'Alex::SOA::Scheduler', size: 1 }
 end
