@@ -15,7 +15,8 @@ post '/api/v1/register' do
     er 'parameter error'
   end
 
-  # check uid and token
+  # get user_id from token,
+  # create or update existing one
 
   token_stub = MessageSourceTokenStub.create(
       source: :github,
