@@ -2,7 +2,8 @@ require './main'
 require './errors'
 require 'sidekiq'
 require 'json'
-require 'http'
+require 'net/http'
+require 'uri'
 
 Sidekiq.configure_client do |config|
   config.redis = { namespace: 'Alex::SOA::Scheduler', size: 1 }
@@ -13,9 +14,11 @@ end
 
 def get_user_id_and_token
   unless @auth_user_id && @auth_token
-    response = HTTP.post(AUTH_URL, params: { username: 'github', password: '123' })
-    if response.status == 200
-      json = JSON.parse(response.to_s)
+    uri = URI(AUTH_URL)
+    response = Net::HTTP.post_form(uri, 'username' => 'github', 'password' => '123')
+    # response = HTTP.post(AUTH_URL, params: { username: 'github', password: '123' })
+    if response.code == '200'
+      json = JSON.parse(response.body)
       if json['status'] == 'ok'
         @auth_user_id = json['user_id']
         @auth_token = json['token']
@@ -67,14 +70,14 @@ def do_github_work
     if messages && messages.size > 0
       # push to scheduler
       u, t = get_user_id_and_token
-      response = HTTP.post(SCHEDULER_PUSH_URL, form: {
-          user_id: u,
-          token: t,
-          json: {simple_message: messages}.to_json
-      })
-      if response.code == 200
+      response = Net::HTTP.post_form(URI(SCHEDULER_PUSH_URL),
+          'user_id' => u,
+          'token' => t,
+          'json' => {simple_message: messages}.to_json
+      )
+      if response.code == '200'
         begin
-          json = JSON.parse(response.to_s)
+          json = JSON.parse(response.body)
           if json['status'] == 'ok'
             puts "successfully pushed #{messages.size} messages"
           else
