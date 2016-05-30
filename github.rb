@@ -32,6 +32,26 @@ post '/api/v1/register' do
   { status: :ok }.to_json
 end
 
+get '/api/v1/check_registered' do
+  begin
+    uid, token = params.fetch_values('id', 'token')
+  rescue KeyError
+    er 'parameter error'
+  end
+
+  # get user_id from token,
+  # create or update existing one
+
+  result = MessageSourceTokenStub.where(
+      source: :github,
+      user_id: uid)
+  if result.size > 0
+    { status: :ok, registered: true }.to_json
+  else
+    { status: :ok, registered: false }.to_json
+  end
+end
+
 get '/api/v1/messages' do
   uid = params['id']
   token = params['token']
