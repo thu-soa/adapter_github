@@ -32,6 +32,22 @@ post '/api/v1/register' do
   { status: :ok }.to_json
 end
 
+delete '/api/v1/register' do
+  begin
+    uid, token = params.fetch_values('id', 'token')
+    er 'parameter error' unless uid && token
+    stub = MessageSourceTokenStub.find_by_user_id(uid)
+    if stub&.destroy
+      { status: :ok }.to_json
+    else
+      er 'wrong id'
+    end
+  rescue
+    er 'wrong parameter'
+  end
+end
+
+
 get '/api/v1/check_registered' do
   begin
     uid, token = params.fetch_values('id', 'token')
