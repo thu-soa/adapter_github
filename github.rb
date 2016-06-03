@@ -43,6 +43,8 @@ post '/api/v1/register' do
       content: "#{gh_uname}:#{gh_token}")
 
   er 'database error' unless token_stub
+
+  Thread.new { `./ruby github_worker.rb` }
   { status: :ok }.to_json
 end
 
