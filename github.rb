@@ -28,14 +28,15 @@ end
 
 post '/api/v1/register' do
   begin
-    uid, token, gh_uname, gh_token =
-        params.fetch_values('id', 'token', 'github_user_name', 'github_token')
+    token, gh_uname, gh_token =
+        params.fetch_values('token', 'github_user_name', 'github_token')
   rescue KeyError
     er 'parameter error'
   end
 
   # get user_id from token,
   # create or update existing one
+  uid = get_user_by_token(token)['id']
 
   token_stub = MessageSourceTokenStub.create(
       source: :github,
