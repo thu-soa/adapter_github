@@ -41,7 +41,7 @@ def pull_user(username, token, user_id)
       json_str =`curl -s -u #{username}:#{token} https://api.github.com/notifications -H "If-Modified-Since: #{t}"`
       notifications = JSON.parse(json_str)
       notifications.each do |notification|
-        name = notification['repository'] ? notification['repository']['full_name'] || 'no author'
+        name = notification['repository'] ? notification['repository']['full_name'] : 'no author'
         reason = notification['reason']
         title = notification['subject'] ? notification['subject']['title'] : 'no title'
         url = notification['repository']['html_url'] || notification['url']
