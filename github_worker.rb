@@ -31,7 +31,7 @@ end
 
 def pull_user(username, token, user_id)
   ret = []
-  t = '2016-04-23 20:27:46 +0800'
+  t = Time.now - 10 * 86400 # 10 days
   result = `curl -s -I -u #{username}:#{token} https://api.github.com/notifications -H "If-Modified-Since: #{t}"`
   status_line = result.split("\r\n").first
   case status_line.split(' ')[1].to_i
@@ -41,11 +41,12 @@ def pull_user(username, token, user_id)
       json_str =`curl -s -u #{username}:#{token} https://api.github.com/notifications -H "If-Modified-Since: #{t}"`
       notifications = JSON.parse(json_str)
       notifications.each do |notification|
-        name = notification['full_name']
+        name = notification['repository'] ? notification['repository']['full_name'] || 'no author'
         reason = notification['reason']
-        url = notification['url']
+        title = notification['subject'] ? notification['subject']['title'] : 'no title'
+        url = notification['repository']['html_url'] || notification['url']
         message = {
-            title: reason,
+            title: "#{reason}(#{title})",
             user_id: user_id,
             url: url,
             source: 'github',
